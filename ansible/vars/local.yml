@@ -1,0 +1,10 @@
+---
+docker_version: 1.6.2
+docker_port: 2375
+docker_compose_version: 1.3.1
+docker_bin_path: ./bin/docker
+docker_compose_bin_path: ./bin/docker-compose
+env_values:
+  - { key: DOCKER_HOST, value: "tcp://172.17.9.101:{{ docker_port }}" }
+  - { key: PATH, value: "{{ ansible_env.PWD }}/bin:$PATH" }
+  - { key: CONFIG_JSON, value: "/opt/nginx-consul-template/config.json" }

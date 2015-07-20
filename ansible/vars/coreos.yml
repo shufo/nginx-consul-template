@@ -1,0 +1,14 @@
+---
+# Docker
+docker_tls: no
+docker_port: 2375
+docker_options: ""
+
+# Consul
+consul_mount_dir: /opt/consul
+
+# Nginx
+nginx_mount_dir: /opt/nginx-consul-template
+
+# Ansible
+ansible_python_interpreter: "PATH=/home/core/bin:$PATH python"

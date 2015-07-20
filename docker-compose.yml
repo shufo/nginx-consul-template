@@ -1,0 +1,54 @@
+# nginx
+nginx:
+  build: .
+  volumes:
+    - ${CONFIG_JSON}:/config.json
+  environment:
+    - "affinity:container!=nodes_nginx_*"
+    - "CONSUL_PORT_8500_TCP_ADDR=127.0.0.1"
+    - "LOG_LEVEL=warn"
+    - "CONSUL_KV_PREFIX=nginx"
+  net: "host"
+  restart: always
+
+# example application
+example1:
+  image: httpd:latest
+  environment:
+    SERVICE_NAME: "httpd"
+    SERVICE_TAGS: "0.0.1"
+
+# example application2
+example2:
+  image: httpd:latest
+  environment:
+    SERVICE_NAME: "httpd"
+    SERVICE_TAGS: "0.0.2"
+
+# consul
+consul:
+  command: -server -bootstrap -data-dir /data -ui-dir /ui
+  image: progrium/consul:latest
+  volumes:
+    - "/opt/consul:/data"
+  ports:
+    - "8300"
+    - "8400"
+    - "8500"
+    - "8600/udp"
+  environment:
+    CONSUL_SERVER_ADDRESS:
+    - "affinity:container!=nodes_consul_*"
+  net: "host"
+  restart: always
+
+# service reigstrator
+registrator:
+  command: -internal consul://127.0.0.1:8500
+  image: sttts/registrator:latest
+  volumes:
+    - "/var/run/docker.sock:/tmp/docker.sock"
+  environment:
+    - "affinity:container!=nodes_registrator_*"
+  net: "host"
+  restart: always

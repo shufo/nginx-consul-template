@@ -1,0 +1,52 @@
+{
+  "error_log": "/dev/fd/2",
+  "pid": "/var/run/nginx.pid",
+  "user": "nginx",
+  "worker_processes": "auto",
+  "worker_rlimit_nofile": "100000",
+  "events": {
+    "multi_accept": "on",
+    "use": "epoll",
+    "worker_connections": "8192"
+  },
+  "http": {
+    "access_log": "/dev/fd/1",
+    "default_type": "application/octet-stream",
+    "gzip": "on",
+    "gzip_buffers": "16 8k",
+    "gzip_comp_level": "4",
+    "gzip_proxied": "off",
+    "gzip_types": "application/json",
+    "gzip_vary": "on",
+    "include": "/etc/nginx/mime.types",
+    "index": "index.html index.htm",
+    "keepalive_timeout": "120",
+    "proxy_cache_path": "/var/cache/nginx levels=1:2 keys_zone=one:8m max_size=3000m inactive=600m",
+    "proxy_temp_path": "/var/tmp",
+    "sendfile": "on",
+    "server_tokens": "off",
+    "tcp_nopush": "on",
+    "server": {
+      "httpd": {
+        "listen": "80",
+        "server_name": "apache.sample.com",
+        "charset": "utf-8",
+        "location": {
+            "image": {
+                "expression": "^/image",
+                "proxy_pass": "http://httpd/",
+                "proxy_set_header": "{\"X-Real-IP\": \"$remote_addr\", \"X-Forwarded-For\": \"$proxy_add_x_forwarded_for\", \"X-Forwarded-Proto\": \"$scheme\", \"Host\": \"$host\"}",
+                "if": "{\"$request_method = POST\": \"return 403\"}"
+            }
+        },
+        "upstream": {
+          "keepalive": "64"
+        }
+      },
+      "nginx": {
+        "listen": "80",
+        "server_name": "nginx.sample.com"
+      }
+    }
+  }
+}

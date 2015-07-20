@@ -1,0 +1,5 @@
+[coreos]
+core-01 ansible_ssh_host=172.17.9.101
+[coreos:vars]
+ansible_ssh_user=core
+ansible_python_interpreter="PATH=/home/core/bin:$PATH python"

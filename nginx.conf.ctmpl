@@ -1,0 +1,79 @@
+{{ range "nginx" | ls }}
+{{ .Key }} {{ .Value }};{{ end }}
+
+events {
+  {{ range "nginx/events" | ls }}
+  {{ .Key }} {{ .Value }};{{ end }}
+}
+
+http {
+  {{ range "nginx/http" | ls }}
+  {{ .Key }} {{ .Value }};{{ end }}
+
+  # Pre-requirements: backends must register service name and tag to Consul by specify options like `-e "SERVICE_NAME=app" -e "SERVICE_TAGS=0.0.1"` on container startup.
+
+  # Generate backend servers with service by tag.
+  # If you have a two images with tags as `0.0.1` and `0.0.2` and service name is `app` and value of consul key-value store `service/app/upstream/tag` is `0.0.1`,
+  # this will generate a lines of service named `app` with tag `0.0.1` addresses and ports.
+  # Options are set to `service/service_name/upstream/key` like `service/app/upstream/keepalive.
+  {{ range $service := services }} {{ if ne .Name "consul" }}
+  upstream {{ $service.Name }} {
+      {{ range $tag, $services := service .Name | byTag }}
+        {{ with $backend := printf "nginx/http/server/%s/upstream/current" $service.Name | key }}
+          {{ if $backend }} {{ if eq $backend $tag }}
+              {{ range $services }} server {{ .Address }}:{{ .Port }};
+              {{ end }}
+          {{ else }} {{ end }} {{ else }} {{ end }}
+        {{ else }} server 127.0.0.1:65535; {{ end }}
+      {{ end }}
+    {{ range printf "nginx/http/server/%s/upstream" $service.Name | ls }}
+    {{ if ne .Key "current" }}
+    {{ .Key }} {{ .Value }};{{ end }}{{ end }}
+  }
+  {{ end }} {{ end }}
+
+  # Generate server definitions of services.
+  # You can specify listen port and server_name as `service/service_name/server/listen` and `service/service_name/server/server_name`, and also other options can set to `service/service_name/server/key` or `service/service_name/server/location/key` or `service/service_name/server/location/foo/key`.
+  {{ range $service := services }} {{ if ne $service.Name "consul" }}
+  server {
+    {{ with $port := printf "servive/%s/listen" $service.Name | key }} {{ if $port }}
+    listen {{ $port }}; {{ end }} {{ else }}
+    listen 80; {{ end }}
+
+    {{ with $server_name := printf "nginx/http/server/%s/server_name" $service.Name | key }} {{ if $server_name }}
+    server_name "{{ $server_name }}"; {{ end }} {{ else }}
+    server_name "localhost"; {{ end }}
+
+    root /dev/null;
+
+    {{ range printf "nginx/http/server/%s" $service.Name | ls }} {{ if ne .Key "listen" }} {{ if ne .Key "server_name" }}
+    {{ .Key }} {{ .Value }};{{ end }}{{ end }}{{ end }}
+
+    {{ range $location, $pairs := printf "nginx/http/server/%s/location" $service.Name | tree | byKey }}
+    # location {{ $location }}
+    location {{ printf "nginx/http/server/%s/location/%s/expression" $service.Name $location | key }} {
+      {{ range $pair := $pairs }} {{ if ne .Key "expression" }}
+      {{ if or (eq .Key "proxy_set_header") (eq .Key "proxy_cache_valid") (eq .Key "proxy_cache_bypass") (eq .Key "proxy_cookie_domain") (eq .Key "proxy_cookie_path") (eq .Key "proxy_no_cache") (eq .Key "proxy_redirect") (eq .Key "fastcgi_param") (eq .Key "error_page") (eq .Key "deny") (eq .Key "rewrite") (eq .Key "if")}}
+      {{ if eq $pair.Key "if" }}
+      {{ range $key, $value := printf "nginx/http/server/%s/location/%s/%s" $service.Name $location $pair.Key | key | parseJSON }}
+      if ({{ $key }}) {
+        {{ $value }};
+      }{{ end }}
+      {{ else }}
+      {{ range $key, $value := printf "nginx/http/server/%s/location/%s/%s" $service.Name $location $pair.Key | key | parseJSON }}
+      {{ $pair.Key }} {{ $key }} {{ $value }};{{ end }}{{ end }}
+      {{ else }}
+      {{ .Key }} {{ .Value }};{{ end }}{{ end }}{{ end }}
+    }
+    {{ else }}
+    # root
+    location / {
+      proxy_pass http://{{ $service.Name }}/;
+      {{ range printf "nginx/http/server/%s/location" $service.Name | ls }}
+      {{ .Key }} {{ .Value }};{{ end }}
+    }
+    {{ end }}
+
+  }
+  {{ end }} {{ end }}
+}

@@ -1,0 +1,13 @@
+#cache/log
+*.log
+.DS_Store
+
+# vagrant
+.vagrant
+
+# direnv
+.envrc
+
+# ansible
+ansible/bin/*
+ansible/roles

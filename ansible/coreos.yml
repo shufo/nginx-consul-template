@@ -1,0 +1,44 @@
+---
+- hosts: all
+  vars_files:
+    - vars/coreos.yml
+  gather_facts: False
+  sudo: false
+  roles:
+    - defunctzombie.coreos-bootstrap
+
+- hosts: all
+  handlers:
+    - include: handlers/main.yml
+  vars_files:
+    - vars/coreos.yml
+  tasks:
+    - name: Ensure consul mount directory is present
+      file: path={{ consul_mount_dir }} state=directory
+
+    - name: Ensure nginx mount directory is present
+      file: path={{ nginx_mount_dir }} state=directory
+    - name: Ensure docker-tcp unit file is set
+      template: src=templates/docker-tcp.socket.j2 dest=/etc/systemd/system/docker-tcp.socket
+      notify: restart systemd
+
+    - name: Ensure docker service unit file is set
+      template: src=templates/docker.service.j2 dest=/etc/systemd/system/docker.service
+      sudo: true
+      notify: restart systemd
+      notify: restart docker
+
+    - name: Ensure coreos reboot strategy is off
+      lineinfile: dest=/etc/coreos/update.conf regexp=^reboot-strategy line="reboot-strategy=off"
+
+    - name: Ensure docker-tcp is enabled
+      service: name=docker-tcp.socket enabled=yes
+      register: docker_tcp
+      notify: restart docker
+
+    - name: Ensure docker is stopped
+      service: name=docker state=stopped
+      when: docker_tcp.changed
+
+    - name: Ensure docker-tcp is started
+      service: name=docker-tcp.socket state=started
