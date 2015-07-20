@@ -17,19 +17,19 @@ This repository contains a scripts for creating configurable load balancer docke
 - Run 
 
 ```
-docker run -d -p 80:80 -v $(pwd)/config.json:/config.json --link consul:consul shufo/nginx-consul-template
+docker run -d -p 80:80 -v $(pwd)/config.json:/config.json --link consul:consul -e "CONSUL_KV_PREFIX=nginx" shufo/nginx-consul-template
 ```
 
 - Custom nginx config
 
 ```
-docker run -d -p 80:80 -v $(pwd)/config.json:/config.json --link consul:consul -v /path/to/config.json:/config.json shufo/nginx-consul-template
+docker run -d -p 80:80 -v /path/to/config.json:/config.json --link consul:consul -e "CONSUL_KV_PREFIX=nginx" shufo/nginx-consul-template
 ```
 
 - Custom template
 
 ```
-docker run -d -v $(pwd)/config.json:/config.json -v /path/to/nginx.conf.ctmpl:/etc/nginx/nginx.conf.ctmpl shufo/nginx-consul-template
+docker run -d -p 80:80 -v $(pwd)/config.json:/config.json -v /path/to/nginx.conf.ctmpl:/etc/nginx/nginx.conf.ctmpl -e "CONSUL_KV_PREFIX=nginx" shufo/nginx-consul-template
 ```
 
 - Dynamic configuration change via Consul API.
@@ -100,6 +100,12 @@ docker run -d -v /mnt:/data progrium/consul:latest -server -bootstrap -data-dir 
     {{ end ]}
   {{ end }}
 {{ end }}
+```
+
+- Run with Host networking
+
+```
+docker run -d --net host -v $(pwd)/config.json:/config.json -e "CONSUL_KV_PREFIX=nginx" -e "CONSUL_PORT_8500_TCP_ADDR=CONSUL_HOST_IP" shufo/nginx-consul-template
 ```
 
 ## Contributing
