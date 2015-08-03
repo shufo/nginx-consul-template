@@ -6,7 +6,7 @@
 # settings
 CONFIG_JSON=${CONFIG_JSON:-/config.json}
 CONFIG=$(cat ${CONFIG_JSON})
-CONSUL_KV_PREFIX=${CONSUL_KV_PREFIX}
+CONSUL_KV_PREFIX=${CONSUL_KV_PREFIX:-nginx}
 
 has_value() {
     type=$(echo "$1" | jq -r -e "$2 | type")
