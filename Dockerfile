@@ -11,7 +11,7 @@ RUN curl -SL https://github.com/hashicorp/consul-template/releases/download/v0.1
 ADD nginx.conf /etc/nginx/nginx.conf
 ADD nginx.conf.ctmpl /etc/nginx/nginx.conf.ctmpl
 
-ADD startup.sh restart.sh consul_config.sh /
+ADD startup.sh restart.sh consul_config.sh config.json /
 RUN chmod u+x /startup.sh && \
     chmod u+x /restart.sh && \
     chmod u+x /consul_config.sh
