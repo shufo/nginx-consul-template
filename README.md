@@ -5,7 +5,7 @@ DockerHub Repository: https://registry.hub.docker.com/u/shufo/nginx-consul-templ
 
 ## Overview
 
-This repository contains a scripts for creating configurable load balancer docker image via [Consul](https://www.consul.io/) Key-Value store API with [nginx](http://nginx.org/en/) and [consul-template](https://github.com/hashicorp/consul-template).
+This repository contains a scripts for creating configurable load balancer [Consul](https://www.consul.io/) Key-Value store API with [nginx](http://nginx.org/en/) and [consul-template](https://github.com/hashicorp/consul-template).
 
 ## Requirements
 
