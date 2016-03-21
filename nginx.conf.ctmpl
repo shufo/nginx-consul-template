@@ -36,7 +36,7 @@ http {
   # You can specify listen port and server_name as `service/service_name/server/listen` and `service/service_name/server/server_name`, and also other options can set to `service/service_name/server/key` or `service/service_name/server/location/key` or `service/service_name/server/location/foo/key`.
   {{ range $service := services }} {{ if ne $service.Name "consul" }}
   server {
-    {{ with $port := printf "servive/%s/listen" $service.Name | key }} {{ if $port }}
+    {{ with $port := printf "service/%s/listen" $service.Name | key }} {{ if $port }}
     listen {{ $port }}; {{ end }} {{ else }}
     listen 80; {{ end }}
 
