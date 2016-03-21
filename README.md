@@ -17,25 +17,58 @@ This repository contains a scripts for creating configurable load balancer [Cons
 - Run 
 
 ```
-docker run -d -p 80:80 -v $(pwd)/config.json:/config.json --link consul:consul -e "CONSUL_KV_PREFIX=nginx" shufo/nginx-consul-template
+docker run -d -p 80:80 \
+    --link consul:consul \
+    -e "CONSUL_KV_PREFIX=nginx" \
+    shufo/nginx-consul-template
 ```
 
 - Custom nginx config
 
+Inside the container there is a file `config.json` which contains default values for all of the configuration
+options that are read by the consul template. When this container starts these default values are pre-loaded
+into consul, so that when it comes to reading these values when the template is parsed, there are already default
+values.
+
+However you can change these default values by providing your own `config.json`:
+
 ```
-docker run -d -p 80:80 -v /path/to/config.json:/config.json --link consul:consul -e "CONSUL_KV_PREFIX=nginx" shufo/nginx-consul-template
+docker run -d -p 80:80 \
+    -v /path/to/config.json:/config.json \
+    --link consul:consul \
+    -e "CONSUL_KV_PREFIX=nginx" \
+    shufo/nginx-consul-template
 ```
 
 - Custom template
 
 ```
-docker run -d -p 80:80 -v $(pwd)/config.json:/config.json -v /path/to/nginx.conf.ctmpl:/etc/nginx/nginx.conf.ctmpl -e "CONSUL_KV_PREFIX=nginx" shufo/nginx-consul-template
+docker run -d -p 80:80 \
+    -v $(pwd)/config.json:/config.json \
+    -v /path/to/nginx.conf.ctmpl:/etc/nginx/nginx.conf.ctmpl \
+    -e "CONSUL_KV_PREFIX=nginx" \
+    shufo/nginx-consul-template
 ```
 
 - Dynamic configuration change via Consul API.
 
 ```
 curl -X PUT -d "/var/log/nginx/error.log" http://consul_host:8500/v1/kv/nginx/error_log
+```
+
+- Changing the consul hostname
+
+By default this container tries to connect to a consul server running on localhost. If you want to specify a different
+location for the consul server, set the `CONSUL_PORT_8500_TCP_ADDR` environmental variable. If you are linking this
+container to the consul container then you should set the `CONSUL_PORT_8500_TCP_ADDR` variable to the alias of the
+consul container:
+```
+docker run -d -p 80:80 \
+    -v /path/to/config.json:/config.json \
+    --link consul:consul \
+    -e "CONSUL_KV_PREFIX=nginx" \
+    -e "CONSUL_PORT_8500_TCP_ADDR=consul" \
+    shufo/nginx-consul-template
 ```
 
 
