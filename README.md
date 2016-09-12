@@ -129,8 +129,8 @@ docker run -d -v /mnt:/data progrium/consul:latest -server -bootstrap -data-dir 
 {{ range $key, $pairs := tree "location" | byKey }}
   {{ range $pair := $pairs }}
     {{ range $key, $value := printf "location/%s"  $pair.Key | key | parseJSON }}
-    	{{ $key }}{{ value }}
-    {{ end ]}
+    	{{ $key }}{{ $value }}
+    {{ end }}
   {{ end }}
 {{ end }}
 ```
