@@ -152,4 +152,35 @@ docker run -d --net host -v $(pwd)/config.json:/config.json -e "CONSUL_KV_PREFIX
 ## Contributors
 
 <!-- readme: collaborators,contributors -start -->
+<table>
+<tr>
+    <td align="center">
+        <a href="https://github.com/shufo">
+            <img src="https://avatars.githubusercontent.com/u/1641039?v=4" width="100;" alt="shufo"/>
+            <br />
+            <sub><b>Shuhei Hayashibara</b></sub>
+        </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/emmetog">
+            <img src="https://avatars.githubusercontent.com/u/1182891?v=4" width="100;" alt="emmetog"/>
+            <br />
+            <sub><b>Emmet O'Grady</b></sub>
+        </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/smiller171">
+            <img src="https://avatars.githubusercontent.com/u/3587913?v=4" width="100;" alt="smiller171"/>
+            <br />
+            <sub><b>Scott Miller</b></sub>
+        </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/malaiwah">
+            <img src="https://avatars.githubusercontent.com/u/10375593?v=4" width="100;" alt="malaiwah"/>
+            <br />
+            <sub><b>Michel Belleau</b></sub>
+        </a>
+    </td></tr>
+</table>
 <!-- readme: collaborators,contributors -end -->
