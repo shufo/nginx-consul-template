@@ -148,3 +148,8 @@ docker run -d --net host -v $(pwd)/config.json:/config.json -e "CONSUL_KV_PREFIX
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+## Contributors
+
+<!-- readme: collaborators,contributors -start -->
+<!-- readme: collaborators,contributors -end -->
